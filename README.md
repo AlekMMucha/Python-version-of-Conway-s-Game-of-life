@@ -1,0 +1,1 @@
+Hello, this is going to be my first solo project, i will be attempting to make Conways game of life using tKinter and python!

@@ -1,0 +1,3 @@
+CELL_SIZE = 10
+CELL_COLOUR_ALIVE = "green"
+CELL_COLOUR_DEAD = "white"
