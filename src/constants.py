@@ -1,3 +1,3 @@
 CELL_SIZE = 50
-CELL_COLOUR_ALIVE = "green"
-CELL_COLOUR_DEAD = "white"
+CELL_COLOUR_ALIVE = "black"
+CELL_COLOUR_DEAD = "green"

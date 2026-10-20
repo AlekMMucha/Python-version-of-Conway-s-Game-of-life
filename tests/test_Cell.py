@@ -27,6 +27,6 @@ class TestCell(unittest.TestCase):
         self.assertEqual(new_cell.state, True)
         self.assertEqual(new_cell.button.cget("bg"), constants.CELL_COLOUR_ALIVE)
 
-    def test_block_button_inputs(self):
+    def test_block_button_input(self):
         pass  # This test is a placeholder since the method is not implemented yet
         
