@@ -8,8 +8,8 @@ def main():
     if len(sys.argv)<3:
         raise ValueError("Usage: python3 main.py <width> <height>")
     playing_matrix_x,playing_matrix_y = int(sys.argv[1]),int(sys.argv[2])
-    Window = render(playing_matrix_x,playing_matrix_y)
-    Window.after(500, lambda: game_loop(Window, Window.matrix))
+    Window,matrix = render(playing_matrix_x,playing_matrix_y)
+    Window.bind("<space>", lambda event: game_loop(playing_matrix_x,playing_matrix_y,matrix,Window))
     Window.mainloop()
 
 def create_matrix(width:int, height:int,Window:tk.Tk,list_of_row_frames:list[tk.Frame]) -> list[list[Cell]]:
@@ -32,6 +32,7 @@ def pack_buttons(width:int, height:int,Window:tk.Tk):
             cell_to_pack = matrix[r][c]
             cell_to_pack.button.master = row_frames[r]
             cell_to_pack.button.pack(side="left")
+    return matrix
 
 def render(x,y):     
     Window = tk.Tk()
@@ -39,18 +40,18 @@ def render(x,y):
     Window.overrideredirect(False)
     Window.bind("<Escape>", lambda event: Window.destroy())
     Window.configure(background='black')
-    ###Window.geometry(f"{playing_matrix_x*constants.CELL_SIZE}x{playing_matrix_y*constants.CELL_SIZE}")
-    '''label = tk.Label(Window, text=f"this is a {playing_matrix_x*constants.CELL_SIZE}x{playing_matrix_y*constants.CELL_SIZE} window", font=("Arial", 12))
-    label.pack()'''
-    pack_buttons(x,y,Window)
+    matrix = pack_buttons(x,y,Window)
     Window.geometry("")
-    return Window
+    return Window, matrix
 
-def game_loop(width:int, height:int, matrix:list[list[Cell]]):
-    for r in range(height):
-        for c in range(width):
-            cell = matrix[r][c]
-            cell.block_button_input()
+def game_loop(width:int, height:int, matrix:list[list[Cell]],Window:tk.Tk):
+    if Window.nametowidget('.').bind('<space>'): 
+            for r in range(height):
+                for c in range(width):
+                    #matrix[r][c].block_button_input()
+                    pass
+            Window.unbind('<space>') # Preventing multiple game loops from starting
+
     for r in range(height):
         for c in range(width):
             cell = matrix[r][c]
@@ -70,17 +71,18 @@ def game_loop(width:int, height:int, matrix:list[list[Cell]]):
             cell = matrix[r][c]
             cell.state = cell.next_state
             cell.update_colour()
+    Window.after(constants.GAME_LOOP_DELAY, lambda: game_loop(width,height,matrix,Window))
 
 def count_alive_neighbours(r:int,c:int,width:int,height:int,matrix:list[list[Cell]])->int:
     alive_neighbours = 0
-    alive_neighbours += 1 if matrix[r-1][c-1].state == True and r>0 and c>0 else 0
-    alive_neighbours += 1 if matrix[r-1][c].state == True and r>0 else 0
-    alive_neighbours += 1 if matrix[r-1][c+1].state == True and r>0 and c<width-1 else 0
-    alive_neighbours += 1 if matrix[r][c-1].state == True and c>0 else 0
-    alive_neighbours += 1 if matrix[r][c+1].state == True and c<width-1 else 0
-    alive_neighbours += 1 if matrix[r+1][c-1].state == True and r<height-1 and c>0 else 0
-    alive_neighbours += 1 if matrix[r+1][c].state == True and r<height-1 else 0
-    alive_neighbours += 1 if matrix[r+1][c+1].state == True and r<height-1 and c<width-1 else 0
+    alive_neighbours += 1 if r>0 and c>0 and matrix[r-1][c-1].state == True else 0
+    alive_neighbours += 1 if r>0 and matrix[r-1][c].state == True else 0
+    alive_neighbours += 1 if r>0 and c<width-1 and matrix[r-1][c+1].state == True else 0
+    alive_neighbours += 1 if c>0 and matrix[r][c-1].state == True else 0
+    alive_neighbours += 1 if c<width-1 and matrix[r][c+1].state == True else 0
+    alive_neighbours += 1 if r<height-1 and c>0 and matrix[r+1][c-1].state == True else 0
+    alive_neighbours += 1 if r<height-1 and matrix[r+1][c].state == True else 0
+    alive_neighbours += 1 if r<height-1 and c<width-1 and matrix[r+1][c+1].state == True else 0
     return alive_neighbours
 
 
